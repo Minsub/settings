@@ -1,5 +1,5 @@
 OCR Project Deploy Guide
-=====================
+========================
 
 #1. deploy environments 
 
@@ -64,12 +64,38 @@ multipart-confit 태그 설정을 아래와 같이 변경한다.
 
 ```XML
 <multipart-config>
-      <!-- 100MB max -->
-      <max-file-size>104857600</max-file-size>
-      <max-request-size>104857600</max-request-size>
-      <file-size-threshold>0</file-size-threshold>
+	<!-- 100MB max -->
+	<max-file-size>104857600</max-file-size>
+	<max-request-size>104857600</max-request-size>
+	<file-size-threshold>0</file-size-threshold>
 </multipart-config>
 ```
+
+###2.2.5 JVM Memory Setting
+Tomcat을 구동하는 JVM의 메모리를 직접 지정하는것이 성능이나 운영상 OutOfMemory 에러를 방지할 수 있다.
+**../tomcat8/bin/catalina.bat**(Windows 기준. UNIX계열은 catalina.sh)을 수정하면 된다.
+현재 OCR Server기준으로 아래와 같이 설정했다. (운영 이슈에 따라 변경될 수 있음)
+
+> set CATALINA_OPTS=-Xms512m -Xmx2048m
+
+![deploy10](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy10.PNG?raw=true)
+
+위와 같이 일단 설정했지만 환경에 따라 추가 옵션을 설정해야할 필요가 있을 수 있다.
+아래는 Memory 옵션에 대한 설명이다.
+성능에 따라 GC옵션도 변경할 필요가 있다.
+
+
+구분 | 옵션 | 설명
+-----|------|------
+힙(heap) 영역 크기 | -Xms | JVM 시작 시 힙 영역 크기
+       -           | -Xmx | 최대 힙 영역 크기
+New 영역의 크기    | -XX:NewRatio | New영역과 Old 영역의 비율
+        -          | -XX:NewSize  | New영역의 크기
+        -          | -XX:MaxNewSize  | New영역의 최대 크기
+        -          | -XX:SurvivorRatio | Eden 영역과 Survivor 영역의 비율
+Perm 영역의 크기 | -XX:PermSize | Perm 영역의 크기
+        -                     | -XX:MaxPermSize | Perm 영역의 최대 크기
+
 
 #3. Deploy
 deploy에 여러 방법이 있다. 그 각각에 방법에 대해 설명한다.
