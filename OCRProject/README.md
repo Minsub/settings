@@ -1,189 +1,186 @@
-OCR Project Deploy Guide
-========================
+OCR Project 개발 환경 세팅
+=====================
 
-#1. deploy environments 
+#1.개발환경
 
 Type | Name   | Link
 ---- | -------|---------
+JAVA | jdk1.8.0_73  | https://java.com/ko/download/
 IDE  | Eclipse Mars.2 Release (4.5.2) | http://www.eclipse.org/
 WAS  | Apache tomcat 8.0.32 | http://tomcat.apache.org/
 Build Tool | Apache maven 3.3.9 |https://maven.apache.org/
 
-#2. Environments settings
-deploy를 하기 전에 기본적인 세팅이 필요하다.
-Project 세팅이나 Tomcat세팅등이 필요하다.
+##1.1 환경 구성
+기본적인 폴더 구성은 C:/OCRProject 로 설정한다.
+해당 폴더 하위에 eclipse, tomcat, maven, java 모두 압축을 푼다.
 
-##2.1 Project Setting
-###2.1.1 Installed JREs
-Project에 JAVA 설정 확인이 필요하다. 기본적으로 eclipse.ini 를 잘설정했다면 문제가 없지만 다시 한번 확인하는 의미로 설정확인이 필요하다.
-**Project Right Click -> Preferences -> Java -> Installed JREs**에서 jdk1.8로 되어있는지 확인한다. 안되어 있다면 add해서 설치한 java jdk 1.8폴더를 추가한다.
+###1.1.1 Eclipse 설치
+Eclipse Mars2의 최신 EE버전을 설치
 
-![deploy1](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy1.PNG?raw=true)
+![Eclipse Install](https://raw.githubusercontent.com/Minsub/settings/master/OCRProject/eclipse1.PNG)
 
-###2.2.1 Deployment Assembly 
-WAR파일로 Export할 때 resource 및 Library 를 copy하는 설정이 필요하다. 기본적으로 eclipse가 다 설정해 주지만, external library같은 경우 부가적인 설정이 필요하다. 아래 그림처럼 설정하면 된다.  
-jar파일은 **WEB-INF/lib** 로, 나머지 resource들은 **WEB-INF/classes**로 설정하면 된다.
+###1.1.2 Java 설치
+Java는 1.8 SE 버전을 다운받아 설치하면 된다. Install을 기본 path에 설치하면 되고 설치된 폴더를 C:/OCRProject/java에 복사한다.
+(C:/Program files/java -> C:/OCRProject/java 로 복사)
 
-![deploy2](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy2.PNG?raw=true)
+![Java install]
+(https://github.com/Minsub/settings/blob/master/OCRProject/JAVA1.PNG?raw=true)
 
+###1.1.3 Maven설치
+Maven은 3.x.x 버전을 Binary로 설치
 
-##2.2 Tomcat Setting
+![Maven install]
+(https://github.com/Minsub/settings/blob/master/OCRProject/MAVEN1.PNG?raw=true)
 
-###2.2.1 Install Path
-**C:/OCRProject/tomcat8**로 tomcat을 설치한다.
+###1.1.4 Tomcat 설치
+Tomcat은 8.x 버전으로 Core를 다운받아 C:/OCRProject에 설치
+편의상 폴더명을 apache-tomcat-8.0.36에서 tomcat8로 변경한다.
 
-###2.2.2 server.xml
+![tomcat install]
+(https://github.com/Minsub/settings/blob/master/OCRProject/tomcat1.png?raw=true)
 
-**{ipaddress}:8080/OCR/..** 로 기본 url 및 context path를 설정하기 때문에 기본적으로 설정을 변경할 필요는 없다. 기본세팅으로 들어가는 아래 host 태그 및 속성만 있으면 된다. (../tomcat8/conf/server.xml)
+###1.1.5 설치폴더 구성
 
-```XML
-<Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="true">
-```
+C:/OCRProject에 모든 프로그램을 설치한다. (캡쳐는 편의상 E:/)
+아래와 같이 구성이 된다.
 
-###2.2.3 tomcat-users.xml
-tomcat에서 제공하는 기본 관리하는 기능을 이용하기 위한 설정이다. 또한 Maven을 이용해서 직접 remote deploy할때 필요한 설정을 세팅한다.
-(../tomcat8/conf/tomcat-users..xml)  
-기본적으로 role을 설정하고 그 role에 대한 username 및 password를 설정한다. 여기선 default로 모두 ***tomcat/admin***으로 설정하였다.  
-**manager-script**이 maven deploy시 필요한 설정이다.
-
-```XML
-  <role rolename="admin-gui"/>
-  <role rolename="admin-script"/>
-  <role rolename="manager-script"/>
-  <role rolename="manager-gui"/>
-  <role rolename="manager-jmx"/>
-  <role rolename="manager-status"/>
-  <user username="tomcat" password="admin" roles="manager-script,admin-script"/>
-  <user username="tomcat" password="admin" roles="manager-script,manager-gui,manager-jmx,manager-status"/>
-```
-
-###2.2.4 /manager/conf/web.xml
-remote deploy 기능을 사용할때 manager app(tomcat기본 제공)할때 upload size 제한이 있다. default가 50mb인데 이걸 100mb로 늘려줘야 한다.  
-경로는 **../tomcat8/webapp/manager/conf/web.xml**이다.  
-multipart-confit 태그 설정을 아래와 같이 변경한다.
-
-```XML
-<multipart-config>
-	<!-- 100MB max -->
-	<max-file-size>104857600</max-file-size>
-	<max-request-size>104857600</max-request-size>
-	<file-size-threshold>0</file-size-threshold>
-</multipart-config>
-```
-
-###2.2.5 JVM Memory Setting
-Tomcat을 구동하는 JVM의 메모리를 직접 지정하는것이 성능이나 운영상 OutOfMemory 에러를 방지할 수 있다.
-**../tomcat8/bin/catalina.bat**(Windows 기준. UNIX계열은 catalina.sh)을 수정하면 된다.
-현재 OCR Server기준으로 아래와 같이 설정했다. (운영 이슈에 따라 변경될 수 있음)
-
-> set CATALINA_OPTS=-Xms512m -Xmx2048m
-
-위와 같이 일단 설정했지만 환경에 따라 추가 옵션을 설정해야할 필요가 있을 수 있다.
-아래는 Memory 옵션에 대한 설명이다.
-성능에 따라 GC옵션도 변경할 필요가 있다.
+![install 1]
+(https://github.com/Minsub/settings/blob/master/OCRProject/install2.PNG?raw=true)
 
 
-구분 | 옵션 | 설명
------|------|------
-힙(heap) 영역 크기 | -Xms | JVM 시작 시 힙 영역 크기
-       -           | -Xmx | 최대 힙 영역 크기
-New 영역의 크기    | -XX:NewRatio | New영역과 Old 영역의 비율
-        -          | -XX:NewSize  | New영역의 크기
-        -          | -XX:MaxNewSize  | New영역의 최대 크기
-        -          | -XX:SurvivorRatio | Eden 영역과 Survivor 영역의 비율
-Perm 영역의 크기 | -XX:PermSize | Perm 영역의 크기
-        -                     | -XX:MaxPermSize | Perm 영역의 최대 크기
+##1.2 경로설정
+
+###1.2.1 Maven 세팅
+maven이 Library를 다운로드 받는 경로를 지정해야 한다.
+default는 ${user.home}/.m2/repository 로 되어 있는데 설치환경인 C:/OCRProject/에 모두 저장되기 위해 다음 설정을 한다.
+
+1. 먼저 **C:\OCRProject\apache-maven-3.3.9\repository** 란 폴더를 만든다.
+2. 그리고 ../apache-maven-3.3.9/conf/settings.xml 파일을 열어 다음과 같이 수정한다.
+
+> <localRepository>E:\OCRProject\apache-maven-3.3.9\repository</localRepository>
 
 
-#3. Deploy
-deploy에 여러 방법이 있다. 그 각각에 방법에 대해 설명한다.
-위 환경설정은 아래 설명하는 모든 방법을 위한 세팅을 해놓았다.
+	
 
-##3.1 Export WAR
-가장 일반적인 방법으로 projext를 WAR파일로 직접 export시킨 후 직접 운영서버에 copy한 후 수동으로 tomcat을 실행하는 방식이다. 특별한 세팅이 많이 필요없지만 deploy시 번거로움이 있다.
+![Maven2 ](https://github.com/Minsub/settings/blob/master/OCRProject/MAVEN2.PNG?raw=true)
 
-###3.1.1 WAR 파일 만들기
-**Project (right click) -> Export -> Web -> WAR File** 로 war파일을 만들 수 있다. 파일명은 OCR.war로 한다. (이 파일명이 Context path가 된다.)
+###1.2.2 Eclipse 세팅
 
-![deploy4](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy4.PNG?raw=true)
+####1.2.2.1 eclipse.ini 설정
+eclipse/eclipse.ini 파일을 열어 JDK 경로 및 JVM메모리 설정을 한다.
+설정은 아래와 같다. 주의할 점은 -vm이 -vmargs보다 위에 있어야 한다.
+메모리 설정인 -vmargs의 경우 사용자 환경에 따라 달리해도 된다.
 
-![deploy5](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy5.PNG?raw=true)
+> -vm
+> E:\OCRProject\java\jdk1.8.0_73\bin\javaw.exe
+> -vmargs
+> -Dosgi.requiredJavaVersion=1.7
+> -Xms512m
+> -Xmx512m
 
-###3.1.2 WAR 파일 복사
-FTP를 이용하든 remote desktop을 이용하든 운영서버로 만들어진 WAR파일을 **../tomcat8/webapp/OCR.war**로 복사한다.  
-복사 후 tomcat을 실행하면 자동으로 압출이 풀리고 아래 그림과 같이 OCR 폴더가 생기면서 deploy가 끝난다.
+![eclipse ini setting]
+(https://github.com/Minsub/settings/blob/master/OCRProject/eclipse2.PNG?raw=true)
 
-![deploy3](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy3.PNG?raw=true)
+####1.2.2.2 workspace 설정
+eclipse를 실행하면 workspace를 지정해야되는데 경로를 **C:/OCRProject/workspace**로 지정한다.
 
-##3.2 Remote Deploy with Maven
-Maven을 이용하면 원격에 있는 tomcat서버에 build와 동시에 WAR파일을 복사하고 redeploy할 수 있다.
-이를 위해 약간의 설정이 필요하다. 운영서버의 tomcat설정은 이미 **2.Environments settings** 을 통해 다 설정되었다.
-
-###3.2.1 maven settings (pom.xml)
-Maven을 통해 빌드를 하고 remote deploy를 하기 위한 세팅이 pom.xml에 필요하다.  
-
-![deploy6](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy6.PNG?raw=true)
+![eclipse3](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse3.PNG?raw=true)
 
 
-1.	**maven-war-plugin**
- + external jar를 WAR파일에 자동 복사하는 plug-in
- + directory 태그에서 복사할 폴더를 선택하고(기본 path는 basedir) tragetPath 태그에 WEB-INF/lib를 선택한다.
- + includes 태그를 사용해서 선별적으로 jar를 copy할 수 있는데 보통 다 copy하는게 일반적이므로 생략가능하다.
-  
-```XML
-<plugin>
-  <artifactId>maven-war-plugin</artifactId>
-    <version>2.4</version>
-    <configuration>
-    <webResources>
-    <resource>
-      <directory>/lib</directory>
-      <targetPath>WEB-INF/lib</targetPath>
-      <!-- 
-      <includes>
-        <include>com.abbyy.FREngine.jar</include>
-        <include>jodconverter-core-3.0-beta-4.jar</include>
-        <include>sqljdbc4-4.0.jar</include>
-      </includes>
-      -->
-    </resource>
-    </webResources>
-  </configuration>
-</plugin>
-```
+###1.2.2.3 Maven 설정
+#####maven 경로 설정
+Window->Preferences로 들어가서 Maven->User Setting으로 들어간다.
+User Setting 부분에 이전에 Maven부분에서 설정했던 **../apache-maven-3.3.9/conf/setting.xml**을 지정한다.
 
-2. **tomcat7-maven-plugin**
- + remote deploy를 위한 plug-in
- + path를 /OCR로 선택하고 (WAR파일 경로) url을 운영서버의 ip/port + manager/text로 설정한다.
- + username / password는 이전 세팅에서 manager/conf/web.xml에서 설정한 tomcat/admin으로 설정한다.
 
-```XML
-<plugin>
-  <groupId>org.apache.tomcat.maven</groupId>
-  <artifactId>tomcat7-maven-plugin</artifactId>
-  <version>2.2</version>
-  <configuration>
-    <path>/OCR</path>
-    <url>http://127.0.0.1:8080/manager/text</url>
-    <username>tomcat</username>
-    <password>admin</password>
-  </configuration>
-</plugin>
-```
+![eclipse4](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse4.PNG?raw=true)
 
-###3.2.2  Maven Build
-설정이 끝났으니 이제 build만 하면 자동 배포된다. 프로젝트에서 **Run as -> Maven Build**를 누르면 maven 설정 창이 나타난다.  여기서 프로젝트를 선택하고 Goals에 **tomcat7-redeploy**를 입력한다.  
-그리고 src/test/java에 TEST 코드를 작성 해 놓았다면 자동으로 실행이 된다. 현재 올라가 있는 code는 sample코드가 많으니 이부분은 아래 그림 처럼 Skip한다.  
-이제 설정이 끝났으니 Run 버튼을 눌러 Build!
+#####target 제외
+maven을 이용하여 build했을 경우 **workspace/{project}/target/** 폴더에 컴파일 결과가 생성된다. 이는 형상관리에 올릴 필요가 없는 파일들이기 때문에 자동 제외하는 세팅을 한다.
+Window->Preferences로 들어가서 Team->Ignored Resources 로 들어간다. Add Pattern에서 ****/target/**** 을 입력하면 자동으로 제외된다.
 
-![deploy7](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy7.PNG?raw=true)
+![eclipse5](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse5.PNG?raw=true)
 
-![deploy8](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy8.PNG?raw=true)
+##1.3 Eclipse plug-in 설치
 
-Build가 정상적으로 완료되면 아래와 같은 메세지가 출력된다.
-Build가 성공하면 ../workspace/OCRProject/target 에도 WAR파일이 생기니 참고하면 된다.
+###1.3.1 STS(Spring Tool Suite) 설치
+STS를 직접 설치하지 않았기 때문에 Spring boot를 사용하려면 STS를 Market place에서 설치해야 한다.
+Help->Eclipse Marketplace에서 STS로 검색해서 Spring Tools Suite(STS) for Eclipse 3.8.0을 설치한다.
 
-![deploy9](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy9.PNG?raw=true)
+
+![eclipse6](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse6.PNG?raw=true)
+
+사용할 것 들만 선택 설치가 가능하다. 하지만 다 설치한다.
+
+![eclipse7](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse7.PNG?raw=true)
+
+###1.3.2 CVS 설치
+해당 프로젝트는 CVS에서 형상관리를 하기 때문에 해당 tool을 설치해야한다. STS와 동일한 방법으로 Help->Eclipse Marketplace에서 설치한다. CVS Version Tree 1.7.0을 설치하면 된다.
+
+![eclipse8](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse8.PNG?raw=true)
+
+
+###1.3.3 lombok설치
+lombok은 DTO의 setter,getter를 쉽게 설정할 수 있는 library이다. jar설치는 Maven을 통해서 하면 되는데 IDE에서 사용하려면 따로 설정이 필요하다.
+1. (https://projectlombok.org/download.html) 로 가서 lombok.jar를 다운
+2. jar 실행 후 eclipse 경로 설정 후 install
+
+
+![eclipse11](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse11.PNG?raw=true)
+
+![eclipse12](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse12.PNG?raw=true)
+
+###1.3.4 customize new files
+new를 많이 쓰게 될텐데 기본 설정은 참 불편하게 되어있다. class, interface 등을 쉽고 빠르게 new하기 위해 아래 설정을 한다.
+1. windows -> Perspective -> Customize Perspective 로 간다.
+2. shortcut tab에서 sub-menu를 new로 설정하고 원하는 type들을 선택
+
+![eclipse9](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse9.PNG?raw=true)
+
+![eclipse10](https://github.com/Minsub/settings/blob/master/OCRProject/eclipse10.PNG?raw=true)
+
+
+#2 Spring Boot Project 
+
+개발환경 구성이 완료 되었으니 Spring Boot Project를 샘플로 만들어 보자.
+OCR Project를 개발하기 위해선 이전에 설치한 CVS에서 소스를 받아와 환경 구성을 해야하지만 일단 test로 프로젝트를 만들어 보겠다.
+
+##2.1 Project 생성
+File -> new -> Others를 선택한다. 그리고 Spring Starter Project를 선택
+
+![boot1](https://github.com/Minsub/settings/blob/master/OCRProject/boot1.PNG?raw=true)
+
+프로젝트 이름을 입력하고 Type을 Maven, Java는 1.8, Package는 WAR, Language는 JAVA로 선택한다.
+
+![boot2](https://github.com/Minsub/settings/blob/master/OCRProject/boot2.PNG?raw=true)
+
+다음 단계는 Spring boot에서 기본 설치되는 component들을 선택하는데 옵션에 따라 다르다.
+
+![boot3](https://github.com/Minsub/settings/blob/master/OCRProject/boot3.PNG?raw=true)
+
+Finish를 하면 아래 그림처럼 프로젝트가 만들어 진다.
+
+![boot7](https://github.com/Minsub/settings/blob/master/OCRProject/boot7.PNG?raw=true)
+
+##2.2 Controller 만들기
+Web에서 접근하는 Controller를 하나 만들어보자.
+Class를 만들고 @RestController를 설정하고 @RequstMapping을 설정한다. (아래 그림 참조)
+
+![boot4](https://github.com/Minsub/settings/blob/master/OCRProject/boot4.PNG?raw=true)
+
+##2.3 Build
+Spring Boot는 tomcat설정이 따로 필요가 없다. 내장되어 있다.
+프로젝트에서 우클릭한 후 Run as -> Spring boot app을 실행한다.
+
+![boot5](https://github.com/Minsub/settings/blob/master/OCRProject/boot5.PNG?raw=true)
+
+실행하면 콘솔에 아래와 같은 메세지가 뜨고 서버 온
+
+![boot8](https://github.com/Minsub/settings/blob/master/OCRProject/boot8.PNG?raw=true)
+
+바로 웹에서 접근해보면 정상작동한다.
+
+![boot6](https://github.com/Minsub/settings/blob/master/OCRProject/boot6.PNG?raw=true)
 
 
 #끝
