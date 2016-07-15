@@ -57,10 +57,9 @@ default는 ${user.home}/.m2/repository 로 되어 있는데 설치환경인 C:/O
 1. 먼저 **C:\OCRProject\apache-maven-3.3.9\repository** 란 폴더를 만든다.
 2. 그리고 ../apache-maven-3.3.9/conf/settings.xml 파일을 열어 다음과 같이 수정한다.
 
-> <localRepository>E:\OCRProject\apache-maven-3.3.9\repository</localRepository>
-
-
-	
+```XML
+ <localRepository>E:\OCRProject\apache-maven-3.3.9\repository</localRepository>
+```
 
 ![Maven2 ](https://github.com/Minsub/settings/blob/master/OCRProject/MAVEN2.PNG?raw=true)
 
@@ -181,6 +180,21 @@ Spring Boot는 tomcat설정이 따로 필요가 없다. 내장되어 있다.
 바로 웹에서 접근해보면 정상작동한다.
 
 ![boot6](https://github.com/Minsub/settings/blob/master/OCRProject/boot6.PNG?raw=true)
+
+
+#3. Install External Engine 
+OCR server가 사용하는 외부 engine을 운영 및 개발환경에 미리 설치를 해야 한다.
+
+##3.1 Install OpenOffice 
+Office파일(excel, word, ppt)들을 PDF로 변환하는 외부 엔진으로 OpenOffice를 사용한다.  
+(http://www.openoffice.org/download/)에서 4.1.2를 다운 받아서 설치하면 된다.
+
+![openoffice1](https://github.com/Minsub/settings/blob/master/OCRProject/openoffice1.PNG?raw=true)
+
+##3.2 Install Abbyy FineReader Engine 10
+PDF파일을 OCR 처리하는 외부 엔진이다. 설치 PC에 USB로 된 물리키가 있어야 한다.  
+현재 FineReader Engine 10 버전을 사용중이고 설치파일은 (https://abbyy.technology/en:products:fre:win:v10:download_overview) 에서 받을 수 있지만, product login ID가 필요하다.  
+그래서 현재 구비되어있는 CD로 설치해야한다. 단 한국 시판 업체에 연락해서 install 파일을 구할 수 있다.
 
 
 #끝
