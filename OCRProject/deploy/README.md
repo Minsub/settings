@@ -188,4 +188,24 @@ Build가 성공하면 ../workspace/OCRProject/target 에도 WAR파일이 생기�
 ![deploy9](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy9.PNG?raw=true)
 
 
+#4. 최초 설치가 아닐시 세팅
+배포환경이 OS 최초 세팅이 아니거나, 다른 서비스와 함께 운영되여 한다면 다음과 같이 환경을 설정해야한다.
+
+##4.1 Tomcat설정
+
+###4.1.1 CATALINA_HOME 설정
+Tomcat관련 경로 설정이 기본적으로 catalina.bat에서 설정이 되어있는데 환경변수에 설정이 되어있다면 Tomcat이 실행이 안될 수 있다. 이부분을 설정 해줘여 한다.
+간단하게 환경변수에서 CATALINA_HOME을 지우면 된다. 이부분이 설정되어 있지 않다면 문제 없다.
+
+![deploy10](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/etc_setting.PNG?raw=true)
+
+###4.1.2 JAVA_HOME, JRE_HOME 설정
+CATALINA와 마찬가지로 JAVA_HOME이 환경 변수에서 설정된 버젼을 사용하지 않을 때 (보통 1.6이 기본설정이지만 이번 프로젝트는 1.8로 되어야 한다.) 에는 catalina.bat에서 강제 지정하면 도니다. 코드는 아래와 같다.
+
+```
+set JAVA_HOME=C:\OCRProject\java\jdk1.8.0_101\bin
+set JRE_HOME=C:\OCRProject\java\jre1.8.0_101
+```
+
+
 #끝
