@@ -53,11 +53,11 @@ tomcat에서 제공하는 기본 관리하는 기능을 이용하기 위한 설�
   <role rolename="manager-gui"/>
   <role rolename="manager-jmx"/>
   <role rolename="manager-status"/>
-  <user username="tomcat" password="admin" roles="manager-script,admin-script"/>
+  <user username="tomcat" password="admin" roles="admin-script,admin-script"/>
   <user username="tomcat" password="admin" roles="manager-script,manager-gui,manager-jmx,manager-status"/>
 ```
 
-###2.2.4 /manager/conf/web.xml
+###2.2.4 ${CATALINA_HOME}/webapps/manager/WEB-INF/web.xml
 remote deploy 기능을 사용할때 manager app(tomcat기본 제공)할때 upload size 제한이 있다. default가 50mb인데 이걸 100mb로 늘려줘야 한다.  
 경로는 **../tomcat8/webapp/manager/conf/web.xml**이다.  
 multipart-confit 태그 설정을 아래와 같이 변경한다.
@@ -71,7 +71,14 @@ multipart-confit 태그 설정을 아래와 같이 변경한다.
 </multipart-config>
 ```
 
-###2.2.5 JVM Memory Setting
+###2.2.4 ${CATALINA_HOME}/webapps/manager/META-INF/context.xml
+tomcat의 기본 deploy나 remote deploy를 사용하려면 이부분 을 수정해야 한다.
+점속 권한이 위에서 설정한 tomcat-users.xml의 권한 id/pw가 접속하려면 이부분을 아래 그림 처럼 value 부분을 주석 처리해야 한다.
+
+![deploy11](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy11.PNG?raw=true)
+
+
+###2.2.6 JVM Memory Setting
 Tomcat을 구동하는 JVM의 메모리를 직접 지정하는것이 성능이나 운영상 OutOfMemory 에러를 방지할 수 있다.
 **../tomcat8/bin/catalina.bat**(Windows 기준. UNIX계열은 catalina.sh)을 수정하면 된다.
 현재 OCR Server기준으로 아래와 같이 설정했다. (운영 이슈에 따라 변경될 수 있음)
