@@ -214,5 +214,30 @@ set JAVA_HOME=C:\OCRProject\java\jdk1.8.0_101\bin
 set JRE_HOME=C:\OCRProject\java\jre1.8.0_101
 ```
 
+#5. 배포시 서버 세팅
+운영서버에서 tomcat을 구동시키는 방법에는 console모드랑 windows serivce 모드 두가지 방법이 있다.
+
+##5.1 Console Mode
+Console Mode는 까만화면에 log가 보이도록 application이 떠 있는 상태로 tomcat이 구동된다. 서버가 살아있는지 remoteDesktop에서 쉽게 확인 가능하나, 서버 재부팅시 다시 수동으로 켜줘여 한다.
+
+%CATALINA_HOME%/bin/startup.bat 를 실행해 tomcat을 구동 시킨다. 이때 WAR파일을 복사방법을 사용한다면 ../webppas/OCR.war로 파일을 복사 후 실행하면 된다.
+maven을 이용해 배포한다면  ../webapps/OCR 에 아무것도 application이 등록되지 않는걸 확인하고 startup.bat를 실행 후 이전 3번 가이드대로 실행하면된다.
+재배포일경우 되도록 tomcat을 다 끄고(OCR의 Task들을 다 stop시키고 끄길 바란다.) startup.bat을 실행해 순수 톰캣만 구동하는것을 권장한다.
+
+##5.2 Windows Service Mode
+Windows Service Mode는 background에서 tomcat이 구동되는 것이다. 장점은 설정에 따라 서버 재부팅시 자동으로 실행된다는 점이다.
+
+이를 위해 약간의 설정이 필요하다.
+windows local service에 tomcat 등록을 우선 해야한다. ../tomcat8/bin 으로 콘솔창을 통해 이동한다. (cmd)
+여기서 아래와 같이 명령어를 입력하면 된다.
+```
+../tomcat8/bin> service.bat install
+```
+그럼 자동으로 Tomcat8이라는 서비스가 등록되는데 services.msc 로 확인이 가능하다.
+만약 JAVA_HOME 문제때문에 install이 안될경우 환경 변수JAVA_HOME 설정을 C:\OCRProject\java\jdk1.8.0_101 으로 하면 된다.
+그리고 ../bin의 startup.bat와 service.bat에도 set JAVA_HOME=C:\OCRProject\java\jdk1.8.0_101 를 등록하자.
+
+
+
 
 #끝
