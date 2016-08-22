@@ -233,11 +233,22 @@ windows local service에 tomcat 등록을 우선 해야한다. ../tomcat8/bin �
 ```
 ../tomcat8/bin> service.bat install
 ```
+정상 install 됬다면 아래와 같이 나올것이다.
+
+![deploy13](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy13.PNG?raw=true)
+
 그럼 자동으로 Tomcat8이라는 서비스가 등록되는데 services.msc 로 확인이 가능하다.
 만약 JAVA_HOME 문제때문에 install이 안될경우 환경 변수JAVA_HOME 설정을 C:\OCRProject\java\jdk1.8.0_101 으로 하면 된다.
 그리고 ../bin의 startup.bat와 service.bat에도 set JAVA_HOME=C:\OCRProject\java\jdk1.8.0_101 를 등록하자.
 
+정상적으로 serivce에 등록됬는지 확인하고 속성에서 시작 유형을 자동으로 설정해 재부팅시에도 자동으로 켜지게 한다. (GUI프로그램으로 설정가능)
 
+![deploy12](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy12.PNG?raw=true)
+
+그리고 서비스를 구동하기 위해 service.msc에서 시작을 눌러도 되지만 tomcat이 제공하는 GUI 프로그램을 이용하자.
+실행 파일은 ../tomcat8/bin/tomcat8w.exe 이다. 실행 후 memory 설정과 startup type을 automatic으로하고 시작을 누르면 tomcat이 구동 되는 것이다.
+
+![deploy14](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy14.PNG?raw=true)
 
 
 #끝
