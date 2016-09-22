@@ -64,10 +64,10 @@ multipart-confit 태그 설정을 아래와 같이 변경한다.
 
 ```XML
 <multipart-config>
-	<!-- 100MB max -->
-	<max-file-size>104857600</max-file-size>
-	<max-request-size>104857600</max-request-size>
-	<file-size-threshold>0</file-size-threshold>
+  <!-- 100MB max -->
+  <max-file-size>104857600</max-file-size>
+  <max-request-size>104857600</max-request-size>
+  <file-size-threshold>0</file-size-threshold>
 </multipart-config>
 ```
 
@@ -103,6 +103,19 @@ New 영역의 크기    | -XX:NewRatio | New영역과 Old 영역의 비율
 Perm 영역의 크기 | -XX:PermSize | Perm 영역의 크기
         -                     | -XX:MaxPermSize | Perm 영역의 최대 크기
 
+###2.2.7 Cache Memory Setting
+
+tomcat은 static 파일들을 기본적으로 cache하게 되어있다. (cache사용 하지 않을 수 있다.)
+${CATALINA_HOME}/conf/context.xml 에 아래 문구를 추가해 줘야 한다.
+내용은 메모리를 50mb로 설정하는것이다. 이것을 안하면 캐쉬 메모리 부족에 대한 warning이 뜬다.
+
+  
+```XML
+<Context>
+    <Resources cachingAllowed="true" cacheMaxSize="51200" />
+</Context>
+```
+
 
 #3. Deploy
 deploy에 여러 방법이 있다. 그 각각에 방법에 대해 설명한다.
@@ -134,7 +147,7 @@ Maven을 통해 빌드를 하고 remote deploy를 하기 위한 세팅이 pom.xm
 ![deploy6](https://github.com/Minsub/settings/blob/master/OCRProject/deploy/deploy6.PNG?raw=true)
 
 
-1.	**maven-war-plugin**
+1.  **maven-war-plugin**
  + external jar를 WAR파일에 자동 복사하는 plug-in
  + directory 태그에서 복사할 폴더를 선택하고(기본 path는 basedir) tragetPath 태그에 WEB-INF/lib를 선택한다.
  + includes 태그를 사용해서 선별적으로 jar를 copy할 수 있는데 보통 다 copy하는게 일반적이므로 생략가능하다.
