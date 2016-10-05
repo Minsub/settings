@@ -1,2 +1,4 @@
-# settings
-Development Environment Settings
+# Settings
+Development Environment Settings 
+
+1.OCR Project
